@@ -1,0 +1,31 @@
+user  nginx;
+worker_processes  8; # 2 x the number of CPU cores - Originally 4
+worker_rlimit_nofile 20000; # Originally not included in this file but see performance tuning here - http://stackoverflow.com/questions/7325211/tuning-nginx-worker-process-to-obtain-100k-hits-per-min
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  19000; # originally 1024
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}
