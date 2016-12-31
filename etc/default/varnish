@@ -1,0 +1,22 @@
+START=yes
+NFILES=131072
+MEMLOCK=82000
+INSTANCE=$(uname -n)
+# LUKE http_max_hdr is 1024 to avoid http first read error resource temporarily unavailable
+DAEMON_OPTS="-a :80 \
+    -T localhost:6082 \
+    -f /etc/varnish/default.vcl \
+    -u www-data -g www-data \
+    -S /etc/varnish/secret \
+    -p http_req_size=64000 \
+    -p thread_pools=6 \
+    -p thread_pool_min=25 \
+    -p thread_pool_max=25000 \
+    -p http_resp_hdr_len=64000 \
+    -p thread_pool_add_delay=2 \
+    -p sess_workspace=2621440 \
+    -p cli_timeout=400 \
+    -s malloc,4G \
+    -p cli_buffer=16384 \
+    -p esi_syntax=0x3 \
+    -p shm_reclen=4096"
